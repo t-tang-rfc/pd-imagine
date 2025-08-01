@@ -3,3 +3,7 @@
 
 # --- auxiliary files
 .vscode/
+
+# --- binary data
+artifacts/
+downloads/
