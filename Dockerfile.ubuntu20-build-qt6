@@ -1,0 +1,14 @@
+# @file: pd-imagine/Dockerfile.ubuntu20-build-qt6
+# @brief: This Dockerfile sets up a build environment on Ubuntu 20.04 to build Qt6 from source.
+# @note: In order to makes things more efficient, it is recommended to launch the container with the current workspace mounted as a volume, so that the *Qt source code* and the *built artifacts* can be shared between the host and the container.
+
+# === Use an official Ubuntu 20.04 (focal fossa) as a base image
+# @see: https://hub.docker.com/_/ubuntu/tags?name=20.04
+FROM ubuntu:20.04
+
+SHELL ["/bin/bash", "-euc"]
+
+# === Copy scripts to setup the environment
+COPY --chmod=0755 copy/script/setup_qt_build_env.sh /tmp/setup_qt_build_env.sh
+
+RUN /tmp/setup_qt_build_env.sh
