@@ -9,7 +9,7 @@ set -euo pipefail
 
 # @note: DO NOT create the directories `/ws/downloads` and `/ws/artifacts` in the Dockerfile, as they are expected to be mounted from the host machine.
 if [[ ! -d "/ws/downloads" || ! -d "/ws/artifacts" ]]; then
-	echo "WARNING: Both /ws/downloads and /ws/artifacts directories must exist to execute the `build_qt.sh` script."
+	echo "WARNING: Both /ws/downloads and /ws/artifacts directories must exist to execute the 'build_qt.sh' script."
 	echo "Please mount the current workspace as a volume when running the container."
 	echo "But don't worry, you do not need to rebuild this image, the environment is already set up."
 	echo "If you prefer custom configuration of Qt building, you can re-launch the container interactively to handle the source and build it manually."
