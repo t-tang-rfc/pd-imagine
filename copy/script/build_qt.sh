@@ -7,25 +7,32 @@
 
 set -euo pipefail
 
-# @note: DO NOT create the directories `/ws/downloads` and `/ws/artifacts` in the Dockerfile, as they are expected to be mounted from the host machine.
-if [[ ! -d "/ws/downloads" || ! -d "/ws/artifacts" ]]; then
-	echo "WARNING: Both /ws/downloads and /ws/artifacts directories must exist to execute the 'build_qt.sh' script."
-	echo "Please mount the current workspace as a volume when running the container."
-	echo "But don't worry, you do not need to rebuild this image, the environment is already set up."
-	echo "If you prefer custom configuration of Qt building, you can re-launch the container interactively to handle the source and build it manually."
-	echo "Exiting..."
-	exit 1
-fi
-
-# === Download Qt6 source code ===
-echo "=== Downloading Qt6 source code..."
+# Parameters setting
 QT_VERSION='6.8.2'
 QT_SOURCE_NAME="qt-everywhere-src-${QT_VERSION}"
 QT_SOURCE_URL="https://download.qt.io/official_releases/qt/6.8/6.8.2/single/${QT_SOURCE_NAME}.tar.xz"
 QT_SOURCE_TAR="/ws/downloads/${QT_SOURCE_NAME}.tar.xz"
 QT_ARTIFACT_TAR="/ws/artifacts/Qt-${QT_VERSION}-install.tar.xz"
 
+# @note: DO NOT create the directories `/ws/downloads` and `/ws/artifacts` in the Dockerfile, as they are expected to be mounted from the host machine.
+if [[ ! -d "/ws/downloads" || ! -d "/ws/artifacts" ]]; then
+	echo "WARNING: Both /ws/downloads and /ws/artifacts directories must exist to execute the 'build_qt.sh' script."
+	echo "Please mount the current workspace as a volume when running the container."
+	echo "But don't worry, you do not need to rebuild this image, the environment is already set up."
+	echo "If you prefer custom configuration of Qt building, you can re-launch the container interactively to handle the build in your way."
+	echo "Exiting..."
+	exit 1
+fi
+
+# Check if the artifact tarball already exists
+if [[ -f "${QT_ARTIFACT_TAR}" ]]; then
+	echo "Qt6 artifact tarball ${QT_VERSION}-install.tar.xz already exists in 'artifacts' folder, skip building."
+	echo "If you need a new build, please delete the old artifact and rerun the script."
+	exit 0
+fi
+
 if [[ ! -f "${QT_SOURCE_TAR}" ]]; then
+	echo "=== Downloading Qt6 source code..."
 	wget -q ${QT_SOURCE_URL} -O ${QT_SOURCE_TAR}
 else
 	echo "Qt source tarball already exists at ${QT_SOURCE_TAR}, skipping download."
@@ -45,11 +52,6 @@ cmake --build . --parallel 16
 cmake --install .
 
 # === Create a tarball of the installed Qt ===
-echo "=== Creating a tarball of the installed Qt6..."
-if [[ -f "${QT_ARTIFACT_TAR}" ]]; then
-	echo "Removing existing Qt6 tarball at ${QT_ARTIFACT_TAR}..."
-	rm -f "${QT_ARTIFACT_TAR}"
-fi
 tar -cpJf ${QT_ARTIFACT_TAR} -C ${INSTALL_DIR} .
 
 # === Bye ===
