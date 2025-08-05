@@ -61,6 +61,8 @@ ENV CONTAINER=$PD_CONTAINER_NAME
 USER $PD_USER_NAME
 
 # Set the working directory in the *container*
+RUN mkdir -p /home/$PD_USER_NAME/$PD_WORKSPACE/git-repo
+
 WORKDIR /home/$PD_USER_NAME/$PD_WORKSPACE
 
 # Set the default command
