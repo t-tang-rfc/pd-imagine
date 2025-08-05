@@ -5,10 +5,11 @@
 	},
 	"runArgs": [
 		"--mount", "type=bind,src=${localEnv:HOME}/.gnupg,dst=/home/ubuntu/.gnupg,readonly",
-		"--mount", "type=bind,src=/run/user/1000/gnupg,dst=/run/user/1000/gnupg,readonly"
-	],	
-	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/${localWorkspaceFolderBasename}",
-	"workspaceFolder": "/home/ubuntu/wksp/${localWorkspaceFolderBasename}",
+		"--mount", "type=bind,src=/run/user/1000/gnupg,dst=/run/user/1000/gnupg,readonly",
+		"--mount", "type=bind,src=${localEnv:HOME}/wksp/git-config,dst=/home/ubuntu/wksp/git-config,readonly"
+	],
+	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/git-repo/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/home/ubuntu/wksp/git-repo/${localWorkspaceFolderBasename}",
 	"customizations": {
 		"vscode": {
 			"settings": {
