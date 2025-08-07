@@ -51,6 +51,7 @@ RUN /tmp/install_vnc.sh
 
 # === User Experience Enhancements
 COPY --chmod=0644 copy/config/tmux-conf /tmp/tmux-conf
+COPY --chmod=0600 copy/config/ssh-conf /tmp/ssh-conf
 
 # === Work env. setup
 
@@ -86,6 +87,13 @@ EOT
 RUN <<-EOT
 	cp /tmp/tmux-conf $PD_USER_HOME/.tmux.conf
 	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.tmux.conf
+EOT
+
+# --- Setup SSH ---
+RUN <<-EOT
+	[ -d "$PD_USER_HOME/.ssh" ] || mkdir -p $PD_USER_HOME/.ssh
+	cp /tmp/ssh-conf $PD_USER_HOME/.ssh/config
+	chown -R $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh
 EOT
 
 # --- Clean up ---
