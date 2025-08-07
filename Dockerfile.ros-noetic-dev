@@ -1,0 +1,23 @@
+# /////////////////////////////////////////////////////////////
+# @file: pd-imagine/Dockerfile.ubuntu20-ros1-dev
+# @brief: This Dockerfile sets up a development environment on Ubuntu 20.04 for ROS Noetic development.
+# /////////////////////////////////////////////////////////////
+
+# === Use an official Ubuntu 20.04 (focal fossa) as a base image
+# @see: https://hub.docker.com/_/ubuntu/tags?name=20.04
+FROM ubuntu:20.04
+
+SHELL ["/bin/bash", "-euc"]
+
+# === Copy script to setup the environment
+COPY --chmod=0755 copy/script/install_ros.sh /tmp/install_ros.sh
+
+RUN /tmp/install_ros.sh
+
+# === Set up the working directory
+ARG WKSP='/wksp'
+RUN mkdir $WKSP
+
+WORKDIR $WKSP
+
+CMD ["echo", "ROS Noetic development environment is ready."]
