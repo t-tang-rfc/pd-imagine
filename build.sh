@@ -15,7 +15,7 @@ if [ ! -d "$ARTIFACTS" ]; then
 fi
 
 # Build Docker image using Dockerfile.ubuntu
-docker build -f Dockerfile.ubuntu20-build-qt6 -t pd-imagine:ubuntu20-build-qt6 .
+docker build --network=host -f Dockerfile.ubuntu20-build-qt6 -t pd-imagine:ubuntu20-build-qt6 .
 
 docker_wksp='/wksp'
 docker run --mount "type=bind,source=$(pwd),target=$docker_wksp" pd-imagine:ubuntu20-build-qt6
