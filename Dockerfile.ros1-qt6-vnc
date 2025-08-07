@@ -37,7 +37,7 @@ RUN <<-EOT
 EOT
 
 # === Install Qt6
-COPY artifacts/Qt-6.8.2-install.tar.xz /tmp/Qt-6.8.2-install.tar.xz
+COPY --chmod=0644 artifacts/Qt-6.8.2-install.tar.xz /tmp/Qt-6.8.2-install.tar.xz
 COPY --chmod=0755 copy/script/install_qt.sh /tmp/install_qt.sh
 
 RUN /tmp/install_qt.sh
@@ -69,18 +69,22 @@ RUN <<-EOT
 	useradd --uid $PD_USER_UID --gid $PD_USER_GID -m $PD_USER_NAME
 	echo "${PD_USER_NAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$PD_USER_NAME
 	chmod 0440 /etc/sudoers.d/$PD_USER_NAME
+	mkdir -p $PD_USER_HOME
+	chmod 0750 $PD_USER_HOME
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME
 EOT
 
 # --- Setup VNC/noVNC ---
 RUN <<-EOT
-	[ -d "$PD_USER_HOME" ] || mkdir -p $PD_USER_HOME
-	chmod 0750 $PD_USER_HOME
-	mkdir $PD_USER_HOME/.vnc
+	[ -d "$PD_USER_HOME/.vnc" ] || mkdir $PD_USER_HOME/.vnc
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc
 	cp /tmp/xstartup $PD_USER_HOME/.vnc/xstartup
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc/xstartup
+	cp /tmp/start_vnc.sh $PD_USER_HOME/start_vnc.sh
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/start_vnc.sh
 	echo 'pd-imagine' | vncpasswd -f > $PD_USER_HOME/.vnc/passwd
 	chmod 0600 $PD_USER_HOME/.vnc/passwd
-	cp /tmp/start_vnc.sh $PD_USER_HOME/start_vnc.sh
-	chown -R $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc/passwd
 EOT
 
 # --- Setup tmux ---
@@ -91,9 +95,10 @@ EOT
 
 # --- Setup SSH ---
 RUN <<-EOT
-	[ -d "$PD_USER_HOME/.ssh" ] || mkdir -p $PD_USER_HOME/.ssh
+	[ -d "$PD_USER_HOME/.ssh" ] || mkdir $PD_USER_HOME/.ssh
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh
 	cp /tmp/ssh-conf $PD_USER_HOME/.ssh/config
-	chown -R $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh/config
 EOT
 
 # --- Clean up ---
@@ -105,6 +110,7 @@ USER $PD_USER_NAME
 ENV USER=$PD_USER_NAME
 ENV HOME=$PD_USER_HOME
 ENV SHELL='/bin/bash'
+ENV DISPLAY=':1'
 
 # Expose the noVNC port
 EXPOSE "6901/tcp"
