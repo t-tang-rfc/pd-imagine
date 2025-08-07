@@ -7,3 +7,6 @@
 # --- binary data
 artifacts/
 downloads/
+
+# --- temporary files
+tmp*
