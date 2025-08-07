@@ -101,6 +101,14 @@ RUN <<-EOT
 	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh/config
 EOT
 
+# --- Setup GPG ---
+# Create the necessary directory structure for gpg forwarding
+# @note: This directory is automatically created on Ubuntu Desktop, but it does not exist by default for a Ubuntu docker image.
+RUN <<-EOT
+	mkdir -p -m 0700 /run/user/$PD_USER_UID
+	chown $PD_USER_NAME:$PD_USER_NAME /run/user/$PD_USER_UID
+EOT
+
 # --- Clean up ---
 RUN rm -rf /tmp/*
 
