@@ -1,0 +1,103 @@
+# /////////////////////////////////////////////////////////////
+# @file: pd-imagine/Dockerfile.ros1-qt6-vnc
+# @brief: This Dockerfile sets up a ROS1 and Qt6 environment with VNC support on Ubuntu 20.04.
+# @note: This Dockerfile is designed to be used as a devcontainer for robot related applications development, and you can log in as a non-root user via VNC to interact with the GUI application you created.
+# /////////////////////////////////////////////////////////////
+
+# === Based on pre-built image with ROS Noetic dev. env.
+FROM pd-imagine:ros-noetic-dev
+
+SHELL ["/bin/bash", "-euc"]
+
+# === Basic Scaffolding
+ENV TZ='Asia/Tokyo'
+ENV LANG='C.UTF-8'
+ENV LC_ALL='C.UTF-8'
+
+# Install basic packages
+# @note: The here doc (<<-EOT) strips leading tabs from the content, allowing for cleaner indentation in the Dockerfile.
+# @note: Default cmake version on Ubuntu 20.04 is too old, we get the latest version from Kitware's apt repository.
+# @see: https://apt.kitware.com/
+RUN <<-EOT
+	export DEBIAN_FRONTEND=noninteractive
+	apt-get update
+	apt-get install -y --no-install-recommends \
+		tzdata \
+		wget gnupg ca-certificates \
+		openssh-client git nano tmux \
+		sudo \
+		build-essential
+	wget -qO- https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor > /usr/share/keyrings/kitware-archive-keyring.gpg
+	echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list > /dev/null
+	apt-get update
+	apt-get install -y --no-install-recommends \
+		cmake-data=3.28.6-0kitware1ubuntu20.04.1 cmake=3.28.6-0kitware1ubuntu20.04.1
+	apt-get clean
+	rm -rf /var/lib/apt/lists/*
+EOT
+
+# === Install Qt6
+COPY artifacts/Qt-6.8.2-install.tar.xz /tmp/Qt-6.8.2-install.tar.xz
+COPY --chmod=0755 copy/script/install_qt.sh /tmp/install_qt.sh
+
+RUN /tmp/install_qt.sh
+
+# === Install VNC
+COPY --chmod=0755 copy/script/install_vnc.sh /tmp/install_vnc.sh
+COPY --chmod=0755 copy/config/xstartup /tmp/xstartup
+COPY --chmod=0755 copy/service/start_vnc.sh /tmp/start_vnc.sh
+
+RUN /tmp/install_vnc.sh
+
+# === Work env. setup
+
+# --- Create a non-root user
+# Create a non-root user with the specified UID and GID and grant sudo privileges
+# - Latest ubuntu image may have automatically created a default non-root user---named `ubuntu`, with user id 1000, group id 1000
+# - However, for ubuntu 20.04, the default user is not created by default, so we create it here.
+ARG PD_USER_NAME='ubuntu'
+ARG PD_USER_UID='1000'
+ARG PD_USER_GID=$PD_USER_UID
+ARG PD_USER_HOME="/home/${PD_USER_NAME}"
+ARG PD_WORKSPACE='wksp'
+RUN <<-EOT
+	groupadd --gid $PD_USER_GID $PD_USER_NAME
+	useradd --uid $PD_USER_UID --gid $PD_USER_GID -m $PD_USER_NAME
+	echo "${PD_USER_NAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$PD_USER_NAME
+	chmod 0440 /etc/sudoers.d/$PD_USER_NAME
+EOT
+
+# --- Setup the VNC/noVNC ---
+RUN <<-EOT
+	[ -d "$PD_USER_HOME" ] || mkdir -p $PD_USER_HOME
+	chmod 0750 $PD_USER_HOME
+	mkdir $PD_USER_HOME/.vnc
+	cp /tmp/xstartup $PD_USER_HOME/.vnc/xstartup
+	echo 'pd-imagine' | vncpasswd -f > $PD_USER_HOME/.vnc/passwd
+	chmod 0600 $PD_USER_HOME/.vnc/passwd
+	cp /tmp/start_vnc.sh $PD_USER_HOME/start_vnc.sh
+	chown -R $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME
+EOT
+
+# --- Clean up ---
+RUN rm -rf /tmp/*
+
+# --- Launchpad
+USER $PD_USER_NAME
+
+ENV USER=$PD_USER_NAME
+ENV HOME=$PD_USER_HOME
+ENV SHELL='/bin/bash'
+
+# Expose the noVNC port
+EXPOSE "6901/tcp"
+
+# Set the working directory in the *container*
+RUN mkdir -p /home/$USER/$PD_WORKSPACE/git-repo
+
+WORKDIR /home/$USER/$PD_WORKSPACE
+
+# Set the default command
+CMD echo "PLEASE LOGIN TO THE CONTAINER AND RUN THE SERVICE MANUALLY" && \
+	echo "@host: docker run -it <image-name> bash" && \
+	echo "@docker: <your-command-here>"
