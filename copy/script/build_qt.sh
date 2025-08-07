@@ -8,15 +8,16 @@
 set -euo pipefail
 
 # Parameters setting
+WKSP='/wksp'
 QT_VERSION='6.8.2'
 QT_SOURCE_NAME="qt-everywhere-src-${QT_VERSION}"
 QT_SOURCE_URL="https://download.qt.io/official_releases/qt/6.8/6.8.2/single/${QT_SOURCE_NAME}.tar.xz"
-QT_SOURCE_TAR="/ws/downloads/${QT_SOURCE_NAME}.tar.xz"
-QT_ARTIFACT_TAR="/ws/artifacts/Qt-${QT_VERSION}-install.tar.xz"
+QT_SOURCE_TAR="${WKSP}/downloads/${QT_SOURCE_NAME}.tar.xz"
+QT_ARTIFACT_TAR="${WKSP}/artifacts/Qt-${QT_VERSION}-install.tar.xz"
 
-# @note: DO NOT create the directories `/ws/downloads` and `/ws/artifacts` in the Dockerfile, as they are expected to be mounted from the host machine.
-if [[ ! -d "/ws/downloads" || ! -d "/ws/artifacts" ]]; then
-	echo "WARNING: Both /ws/downloads and /ws/artifacts directories must exist to execute the 'build_qt.sh' script."
+# @note: DO NOT create the directories `${WKSP}/downloads` and `${WKSP}/artifacts` in the Dockerfile, as they are expected to be mounted from the host machine.
+if [[ ! -d "${WKSP}/downloads" || ! -d "${WKSP}/artifacts" ]]; then
+	echo "WARNING: Both ${WKSP}/downloads and ${WKSP}/artifacts directories must exist to execute the 'build_qt.sh' script."
 	echo "Please mount the current workspace as a volume when running the container."
 	echo "But don't worry, you do not need to rebuild this image, the environment is already set up."
 	echo "If you prefer custom configuration of Qt building, you can re-launch the container interactively to handle the build in your way."

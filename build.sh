@@ -17,4 +17,5 @@ fi
 # Build Docker image using Dockerfile.ubuntu
 docker build -f Dockerfile.ubuntu20-build-qt6 -t pd-imagine:ubuntu20-build-qt6 .
 
-docker run --mount "type=bind,source=$(pwd),target=/ws" pd-imagine:ubuntu20-build-qt6
+docker_wksp='/wksp'
+docker run --mount "type=bind,source=$(pwd),target=$docker_wksp" pd-imagine:ubuntu20-build-qt6

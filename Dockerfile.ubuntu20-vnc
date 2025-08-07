@@ -31,6 +31,9 @@ EOT
 EXPOSE "6901/tcp"
 
 # === Set up the working directory
-WORKDIR /ws
+ARG WKSP='/wksp'
+RUN mkdir $WKSP
+
+WORKDIR $WKSP
 
 CMD ["/tmp/start_vnc.sh"]

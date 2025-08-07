@@ -16,7 +16,10 @@ COPY --chmod=0755 copy/script/setup_qt_build_env.sh /tmp/setup_qt_build_env.sh
 RUN /tmp/setup_qt_build_env.sh
 
 # === Set up the working directory
-WORKDIR /ws
+ARG WKSP='/wksp'
+RUN mkdir $WKSP
+
+WORKDIR $WKSP
 
 # === Copy script to build Qt6
 COPY --chmod=0755 copy/script/build_qt.sh /tmp/build_qt.sh

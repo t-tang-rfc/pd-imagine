@@ -15,6 +15,9 @@ COPY --chmod=0755 copy/script/install_ros.sh /tmp/install_ros.sh
 RUN /tmp/install_ros.sh
 
 # === Set up the working directory
-WORKDIR /ws
+ARG WKSP='/wksp'
+RUN mkdir $WKSP
+
+WORKDIR $WKSP
 
 CMD ["echo", "ROS Noetic development environment is ready."]
