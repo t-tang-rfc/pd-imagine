@@ -1,0 +1,36 @@
+# /////////////////////////////////////////////////////////////
+# @file: pd-imagine/Dockerfile.ubuntu20-vnc
+# @brief: This Dockerfile sets up a development environment on Ubuntu 20.04 with VNC support.
+# @details: Besides ordinary VNC, it supports web-based noVNC for remote access.
+# /////////////////////////////////////////////////////////////
+
+# === Use an official Ubuntu 20.04 (focal fossa) as a base image
+# @see: https://hub.docker.com/_/ubuntu/tags?name=20.04
+FROM ubuntu:20.04
+
+SHELL ["/bin/bash", "-euc"]
+
+# === Copy script to setup the environment
+COPY --chmod=0755 copy/script/install_vnc.sh /tmp/install_vnc.sh
+COPY --chmod=0755 copy/config/xstartup /tmp/xstartup
+COPY --chmod=0755 copy/service/start_vnc.sh /tmp/start_vnc.sh
+
+RUN /tmp/install_vnc.sh
+
+# --- Setup the VNC/noVNC ---
+ENV HOME='/root'
+RUN <<-EOT
+	[ -d "$HOME/.vnc" ] || mkdir -p $HOME/.vnc
+	cp /tmp/xstartup $HOME/.vnc/xstartup
+	echo 'pd-imagine' | vncpasswd -f > $HOME/.vnc/passwd
+	chmod 0600 $HOME/.vnc/passwd
+	cp /tmp/start_vnc.sh $HOME/start_vnc.sh
+EOT
+
+# --- Expose the noVNC port ---
+EXPOSE "6901/tcp"
+
+# === Set up the working directory
+WORKDIR /ws
+
+CMD ["/tmp/start_vnc.sh"]
