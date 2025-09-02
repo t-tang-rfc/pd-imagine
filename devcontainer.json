@@ -9,18 +9,19 @@
 		"--shm-size=2g",
 		"--device=/dev/input/js0"
 	],
-	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/git-repo/${localWorkspaceFolderBasename}",
-	"workspaceFolder": "/home/ubuntu/wksp/git-repo/${localWorkspaceFolderBasename}",
+	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/git-repo/river/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/home/ubuntu/wksp/git-repo/river/${localWorkspaceFolderBasename}",
 	"customizations": {
 		"vscode": {
 			"settings": {},
 			"extensions": [
+				"ericmccarthy.vs-code-mark-point",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
 				"ms-vscode.cpptools",
 				"ms-vscode.cmake-tools",
 				"theqtcompany.qt-core",
-				"theqtcompany.qt-qml",
-				"eamodio.gitlens",
-				"streetsidesoftware.code-spell-checker"
+				"theqtcompany.qt-qml"
 			]
 		}
 	}
