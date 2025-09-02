@@ -38,8 +38,10 @@ create_ros_noetic_dev_image() {
 }
 
 build_qt6() {
-	# Accept Ubuntu version as argument (default to 20.04)
+	# Accept Ubuntu version as argument (should be either 20.04 or 24.04)
 	local ubuntu_version=${1:-20.04}
+	local image_tag="pd-imagine:ubuntu${ubuntu_version//.}-build-qt6"
+	local docker_wksp='/wksp'
 	
 	if [ ! -f "$QT_ARTIFACT_TAR" ]; then
 		echo "=== Building Qt6 from source using Ubuntu ${ubuntu_version}..."
@@ -52,42 +54,28 @@ build_qt6() {
 		fi
 
 		# Ensure the build environment is set up based on version
-		if [ "$ubuntu_version" = "20.04" ]; then
-			create_ubuntu20_build_qt6_image
-			docker_image="pd-imagine:ubuntu20-build-qt6"
-		elif [ "$ubuntu_version" = "24.04" ]; then
-			create_ubuntu24_build_qt6_image
-			docker_image="pd-imagine:ubuntu24-build-qt6"
-		else
-			echo "Error: Unsupported Ubuntu version '$ubuntu_version'. Supported versions: 20.04, 24.04"
-			exit 1
-		fi
+
+		create_ubuntu_build_qt6_image "$ubuntu_version" "$image_tag"
 		
 		# Build Qt6 using the appropriate Docker image
-		docker_wksp='/wksp'
-		docker run --mount "type=bind,source=$(pwd),target=$docker_wksp" "$docker_image"
+		docker run --mount "type=bind,source=$(pwd),target=$docker_wksp" "$image_tag"
 	else
 		echo "[INFO] Qt6 artifact tarball already exists at ${QT_ARTIFACT_TAR}, skipping build."
 	fi
 }
 
-create_ubuntu20_build_qt6_image() {
+create_ubuntu_build_qt6_image() {
+	# Accept Ubuntu version as argument (should be either 20.04 or 24.04)
+	local ubuntu_version=${1}
+	# Accept image tag as argument
+	local image_tag=${2}
+	
 	# Build Docker image using Dockerfile.ubuntu-build-qt6
-	if ! docker image inspect pd-imagine:ubuntu20-build-qt6 >/dev/null 2>&1; then
-		echo "=== Building Docker image pd-imagine:ubuntu20-build-qt6..."
-		docker build --network=host --build-arg UBUNTU_VERSION=20.04 -f Dockerfile.ubuntu-build-qt6 -t pd-imagine:ubuntu20-build-qt6 .
+	if ! docker image inspect "$image_tag" >/dev/null 2>&1; then
+		echo "=== Building Docker image $image_tag..."
+		docker build --network=host --build-arg UBUNTU_VERSION="$ubuntu_version" -f Dockerfile.ubuntu-build-qt6 -t "$image_tag" .
 	else
-		echo "[INFO] Docker image pd-imagine:ubuntu20-build-qt6 already exists, skipping build."
-	fi
-}
-
-create_ubuntu24_build_qt6_image() {
-	# Build Docker image using Dockerfile.ubuntu-build-qt6
-	if ! docker image inspect pd-imagine:ubuntu24-build-qt6 >/dev/null 2>&1; then
-		echo "=== Building Docker image pd-imagine:ubuntu24-build-qt6..."
-		docker build --network=host --build-arg UBUNTU_VERSION=24.04 -f Dockerfile.ubuntu-build-qt6 -t pd-imagine:ubuntu24-build-qt6 .
-	else
-		echo "[INFO] Docker image pd-imagine:ubuntu24-build-qt6 already exists, skipping build."
+		echo "[INFO] Docker image $image_tag already exists, skipping build."
 	fi
 }
 
@@ -99,7 +87,6 @@ usage() {
 	echo "  - create_ros1_qt6_vnc_image"
 	echo "  - create_ros_noetic_dev_image"
 	echo "  - build_qt6 [20.04|24.04]           (build Qt6, defaults to Ubuntu 20.04)"
-	echo "  - create_ubuntu20_build_qt6_image"
 }
 
 # === Main execution logic
