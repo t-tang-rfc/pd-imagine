@@ -1,0 +1,28 @@
+{
+	"name": "pd-imagine",
+	"image": "pd-imagine:ros1-qt6-vnc",
+	"runArgs": [
+		"--mount", "type=bind,src=${localEnv:HOME}/.gnupg,dst=/home/ubuntu/.gnupg,readonly",
+		"--mount", "type=bind,src=/run/user/1000/gnupg,dst=/run/user/1000/gnupg,readonly",
+		"--mount", "type=bind,src=${localEnv:HOME}/wksp/git-config,dst=/home/ubuntu/wksp/git-config,readonly",
+		"--publish", "6901:6901/tcp",
+		"--shm-size=2g",
+		"--device=/dev/input/js0"
+	],
+	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/git-repo/river/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/home/ubuntu/wksp/git-repo/river/${localWorkspaceFolderBasename}",
+	"customizations": {
+		"vscode": {
+			"settings": {},
+			"extensions": [
+				"ericmccarthy.vs-code-mark-point",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
+				"ms-vscode.cpptools",
+				"ms-vscode.cmake-tools",
+				"theqtcompany.qt-core",
+				"theqtcompany.qt-qml"
+			]
+		}
+	}
+}

@@ -63,7 +63,7 @@ ARG PD_USER_NAME='ubuntu'
 ARG PD_USER_UID='1000'
 ARG PD_USER_GID=$PD_USER_UID
 ARG PD_USER_HOME="/home/${PD_USER_NAME}"
-ARG PD_WORKSPACE='wksp'
+ARG PD_WORKSPACE="${PD_USER_HOME}/wksp"
 RUN <<-EOT
 	groupadd --gid $PD_USER_GID $PD_USER_NAME
 	useradd --uid $PD_USER_UID --gid $PD_USER_GID -m $PD_USER_NAME
@@ -124,9 +124,7 @@ ENV DISPLAY=':1'
 EXPOSE "6901/tcp"
 
 # Set the working directory in the *container*
-RUN mkdir -p /home/$USER/$PD_WORKSPACE/git-repo
-
-WORKDIR /home/$USER/$PD_WORKSPACE
+WORKDIR $PD_WORKSPACE
 
 # Set the default command
 CMD echo "PLEASE LOGIN TO THE CONTAINER AND RUN THE SERVICE MANUALLY" && \
