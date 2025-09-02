@@ -69,16 +69,22 @@ create_ubuntu20_build_qt6_image() {
 	fi
 }
 
-# === Main execution logic
+# === Helper Functions
 
-# Check if a function name was provided
-if [ $# -eq 0 ]; then
+usage() {
 	echo "Usage: $0 <function_name>"
 	echo "Available functions:"
 	echo "  - create_ros1_qt6_vnc_image"
 	echo "  - create_ros_noetic_dev_image"
 	echo "  - build_qt6"
 	echo "  - create_ubuntu20_build_qt6_image"
+}
+
+# === Main execution logic
+
+# Check if a function name was provided
+if [ $# -eq 0 ]; then
+	usage
 	exit 1
 fi
 
@@ -91,10 +97,6 @@ if declare -f "$FUNCTION_NAME" > /dev/null; then
 	"$FUNCTION_NAME"
 else
 	echo "Error: Function '$FUNCTION_NAME' not found."
-	echo "Available functions:"
-	echo "  - create_ros1_qt6_vnc_image"
-	echo "  - create_ros_noetic_dev_image"
-	echo "  - build_qt6"
-	echo "  - create_ubuntu20_build_qt6_image"
+	usage
 	exit 1
 fi
