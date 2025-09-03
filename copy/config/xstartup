@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/bin/sh
+# ~/.vnc/xstartup
 
-vncconfig -iconic &
-dbus-launch --exit-with-session startxfce4 &
+# Provide an XDG runtime dir (common need in containers)
+export XDG_RUNTIME_DIR=/run/user/$UID
+mkdir -p "$XDG_RUNTIME_DIR"
+chmod 700 "$XDG_RUNTIME_DIR"
+
+# Start XFCE; no dbus-launch needed
+exec startxfce4
