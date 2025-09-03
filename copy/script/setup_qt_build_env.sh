@@ -10,7 +10,7 @@ set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 # === Check Ubuntu version compatibility ===
-if ! grep -qE "Ubuntu (20\.04|24\.04)" /etc/os-release; then
+if ! grep -qE "Ubuntu (20.04|24.04)" /etc/os-release; then
 	echo "Error: This script is only intended for Ubuntu 20.04 and 24.04 LTS"
 	exit 1
 fi
