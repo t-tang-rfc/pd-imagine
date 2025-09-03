@@ -36,6 +36,8 @@ EOT
 COPY --chmod=0644 artifacts/Qt-6.8.2-install.tar.xz /tmp/Qt-6.8.2-install.tar.xz
 COPY --chmod=0755 copy/script/install_qt.sh /tmp/install_qt.sh
 
+RUN /tmp/install_qt.sh
+
 # === Install VNC
 COPY --chmod=0755 copy/script/install_vnc.sh /tmp/install_vnc.sh
 COPY --chmod=0755 copy/config/xstartup /tmp/xstartup
