@@ -5,12 +5,6 @@
 
 set -euo pipefail
 
-# === Parameters setting
-
-DOWNLOADS='./downloads'
-ARTIFACTS='./artifacts'
-QT_ARTIFACT_TAR="${ARTIFACTS}/Qt-6.8.2-install.tar.xz"
-
 # === Function Definitions
 
 create_ros1_qt6_vnc_image() {
@@ -37,20 +31,34 @@ create_ros_noetic_dev_image() {
 	fi
 }
 
+# create_qt6_dev_vnc() {
+	# Build Docker image using Dockerfile.qt6-dev-vnc
+	# if ! docker image inspect pd-imagine:qt6-dev-vnc >/dev/null 2>&1; then
+	# 	echo "=== Building Docker image pd-imagine:qt6-dev-vnc..."
+	# 	build_qt6 24.04
+	# 	docker build --network=host -f Dockerfile.qt6-dev-vnc -t pd-imagine:qt6-dev-vnc .
+	# else
+	# 	echo "[INFO] Docker image pd-imagine:qt6-dev-vnc already exists, skipping build."
+	# fi
+# }
+
 build_qt6() {
 	# Accept Ubuntu version as argument (should be either 20.04 or 24.04)
-	local ubuntu_version=${1:-20.04}
+	local ubuntu_version=${1:-24.04}
 	local image_tag="pd-imagine:ubuntu${ubuntu_version//.}-build-qt6"
 	local docker_wksp='/wksp'
-	
+	local downloads='./downloads'
+	local artifacts='./artifacts'
+	local QT_ARTIFACT_TAR="${artifacts}/Qt-6.8.2-install.tar.xz"
+
 	if [ ! -f "$QT_ARTIFACT_TAR" ]; then
 		echo "=== Building Qt6 from source using Ubuntu ${ubuntu_version}..."
 		# Folder structure preparation
-		if [ ! -d "$DOWNLOADS" ]; then
-			mkdir "$DOWNLOADS"
+		if [ ! -d "$downloads" ]; then
+			mkdir "$downloads"
 		fi
-		if [ ! -d "$ARTIFACTS" ]; then
-			mkdir "$ARTIFACTS"
+		if [ ! -d "$artifacts" ]; then
+			mkdir "$artifacts"
 		fi
 
 		# Ensure the build environment is set up based on version
@@ -86,7 +94,8 @@ usage() {
 	echo "Available functions:"
 	echo "  - create_ros1_qt6_vnc_image"
 	echo "  - create_ros_noetic_dev_image"
-	echo "  - build_qt6 [20.04|24.04]           (build Qt6, defaults to Ubuntu 20.04)"
+	# echo "  - create_qt6_dev_vnc"
+	echo "  - build_qt6 [20.04|24.04]           (build Qt6, defaults to Ubuntu 24.04)"
 }
 
 # === Main execution logic
