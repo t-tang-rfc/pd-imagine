@@ -13,7 +13,7 @@ create_ros1_qt6_vnc_image() {
 		echo "=== Building Docker image pd-imagine:ros1-qt6-vnc..."
 		# Dependencies
 		create_ros_noetic_dev_image
-		build_qt6 20.04
+		build_qt6_on_ubuntu 20.04
 		# Build the image
 		docker build --network=host -f Dockerfile.ros1-qt6-vnc -t pd-imagine:ros1-qt6-vnc .
 	else
@@ -31,21 +31,21 @@ create_ros_noetic_dev_image() {
 	fi
 }
 
-# create_qt6_dev_vnc() {
+create_qt6_dev_vnc_image() {
 	# Build Docker image using Dockerfile.qt6-dev-vnc
-	# if ! docker image inspect pd-imagine:qt6-dev-vnc >/dev/null 2>&1; then
-	# 	echo "=== Building Docker image pd-imagine:qt6-dev-vnc..."
-	# 	build_qt6 24.04
-	# 	docker build --network=host -f Dockerfile.qt6-dev-vnc -t pd-imagine:qt6-dev-vnc .
-	# else
-	# 	echo "[INFO] Docker image pd-imagine:qt6-dev-vnc already exists, skipping build."
-	# fi
-# }
+	if ! docker image inspect pd-imagine:qt6-dev-vnc >/dev/null 2>&1; then
+		echo "=== Building Docker image pd-imagine:qt6-dev-vnc..."
+		build_qt6_on_ubuntu 24.04
+		docker build --network=host -f Dockerfile.qt6-dev-vnc -t pd-imagine:qt6-dev-vnc .
+	else
+		echo "[INFO] Docker image pd-imagine:qt6-dev-vnc already exists, skipping build."
+	fi
+}
 
-build_qt6() {
+build_qt6_on_ubuntu() {
 	# Accept Ubuntu version as argument (should be either 20.04 or 24.04)
 	local ubuntu_version=${1:-24.04}
-	local image_tag="pd-imagine:ubuntu${ubuntu_version//.}-build-qt6"
+	local image_tag="pd-imagine:ubuntu-${ubuntu_version}-build-qt6"
 	local docker_wksp='/wksp'
 	local downloads='./downloads'
 	local artifacts='./artifacts'
@@ -92,10 +92,10 @@ create_ubuntu_build_qt6_image() {
 usage() {
 	echo "Usage: $0 <function_name>"
 	echo "Available functions:"
+	echo "  - create_qt6_dev_vnc_image"
 	echo "  - create_ros1_qt6_vnc_image"
 	echo "  - create_ros_noetic_dev_image"
-	# echo "  - create_qt6_dev_vnc"
-	echo "  - build_qt6 [20.04|24.04]           (build Qt6, defaults to Ubuntu 24.04)"
+	echo "  - build_qt6_on_ubuntu [20.04|24.04] (defaults to Ubuntu 24.04)"
 }
 
 # === Main execution logic

@@ -1,0 +1,120 @@
+# /////////////////////////////////////////////////////////////
+# @file: pd-imagine/Dockerfile.qt6-dev-vnc
+# @brief: This Dockerfile sets up a Qt6 development environment with VNC support on Ubuntu 24.04.
+# /////////////////////////////////////////////////////////////
+
+# === Use an official Ubuntu 24.04 (noble numbat) as a base image 
+# @see: https://hub.docker.com/_/ubuntu
+FROM ubuntu:24.04
+
+SHELL ["/bin/bash", "-euc"]
+
+# === Basic Scaffolding
+ENV TZ='Asia/Tokyo'
+ENV LANG='C.UTF-8'
+ENV LC_ALL='C.UTF-8'
+
+# Install basic packages
+# @note: The here doc (<<-EOT) strips leading tabs from the content, allowing for cleaner indentation in the Dockerfile.
+# @note: Default cmake version on Ubuntu 20.04 is too old, we get the latest version from Kitware's apt repository.
+# @see: https://apt.kitware.com/
+RUN <<-EOT
+	export DEBIAN_FRONTEND=noninteractive
+	apt-get update
+	apt-get install -y --no-install-recommends \
+		tzdata \
+		wget gnupg ca-certificates \
+		openssh-client git nano tmux \
+		sudo \
+		build-essential \
+		cmake
+	apt-get clean
+	rm -rf /var/lib/apt/lists/*
+EOT
+
+# === Install Qt6
+COPY --chmod=0644 artifacts/Qt-6.8.2-install.tar.xz /tmp/Qt-6.8.2-install.tar.xz
+COPY --chmod=0755 copy/script/install_qt.sh /tmp/install_qt.sh
+
+# === Install VNC
+COPY --chmod=0755 copy/script/install_vnc.sh /tmp/install_vnc.sh
+COPY --chmod=0755 copy/config/xstartup /tmp/xstartup
+COPY --chmod=0755 copy/service/start_vnc.sh /tmp/start_vnc.sh
+
+RUN /tmp/install_vnc.sh
+
+# === User Experience Enhancements
+COPY --chmod=0644 copy/config/tmux-conf /tmp/tmux-conf
+COPY --chmod=0600 copy/config/ssh-conf /tmp/ssh-conf
+
+# === Work env. setup
+
+# --- Create a non-root user
+# Create a non-root user with the specified UID and GID and grant sudo privileges
+# @note: Ubuntu image has a default non-root user named `ubuntu`, with user id 1000, group id 1000 and this dockerfile is designed to use that one.
+ARG PD_USER_NAME='ubuntu'
+ARG PD_USER_UID='1000'
+ARG PD_USER_GID=$PD_USER_UID
+ARG PD_USER_HOME="/home/${PD_USER_NAME}"
+ARG PD_WORKSPACE="${PD_USER_HOME}/wksp"
+RUN <<-EOT
+	echo "${PD_USER_NAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$PD_USER_NAME
+	chmod 0440 /etc/sudoers.d/$PD_USER_NAME
+EOT
+
+# --- Setup VNC/noVNC ---
+RUN <<-EOT
+	[ -d "$PD_USER_HOME/.vnc" ] || mkdir $PD_USER_HOME/.vnc
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc
+	cp /tmp/xstartup $PD_USER_HOME/.vnc/xstartup
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc/xstartup
+	cp /tmp/start_vnc.sh $PD_USER_HOME/start_vnc.sh
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/start_vnc.sh
+	echo 'pd-imagine' | vncpasswd -f > $PD_USER_HOME/.vnc/passwd
+	chmod 0600 $PD_USER_HOME/.vnc/passwd
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.vnc/passwd
+EOT
+
+# --- Setup tmux ---
+RUN <<-EOT
+	cp /tmp/tmux-conf $PD_USER_HOME/.tmux.conf
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.tmux.conf
+EOT
+
+# --- Setup SSH ---
+RUN <<-EOT
+	[ -d "$PD_USER_HOME/.ssh" ] || mkdir $PD_USER_HOME/.ssh
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh
+	cp /tmp/ssh-conf $PD_USER_HOME/.ssh/config
+	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME/.ssh/config
+EOT
+
+# --- Setup GPG ---
+# Create the necessary directory structure for gpg forwarding
+# @note: This directory is automatically created on Ubuntu Desktop, but it does not exist by default for a Ubuntu docker image.
+RUN <<-EOT
+	mkdir -p -m 0700 /run/user/$PD_USER_UID
+	chown $PD_USER_NAME:$PD_USER_NAME /run/user/$PD_USER_UID
+EOT
+
+# --- Clean up ---
+RUN rm -rf /tmp/*
+
+# --- Launchpad
+USER $PD_USER_NAME
+
+ENV USER=$PD_USER_NAME
+ENV HOME=$PD_USER_HOME
+ENV SHELL='/bin/bash'
+ENV DISPLAY=':1'
+
+# Expose the noVNC port
+EXPOSE "6901/tcp"
+
+# Set the working directory in the *container*
+WORKDIR $PD_WORKSPACE
+
+# Set the default command
+CMD echo "PLEASE LOGIN TO THE CONTAINER AND RUN THE SERVICE MANUALLY" && \
+	echo "@host: docker run -it <image-name> bash" && \
+	echo "@docker: <your-command-here>"
