@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # @file: pd-imagine/build.sh
-# @usage: bash ./build.sh <function_name>
+# @usage: ./build.sh <function_name>
 
 set -euo pipefail
 

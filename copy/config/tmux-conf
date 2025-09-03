@@ -1,4 +1,5 @@
 # @brief: tmux configuration file
+# ~/.tmux.conf
 
 # @note: prevent tmux from creating new *log-in* sessions
 set -g default-command 'exec bash'
