@@ -8,11 +8,10 @@ set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 # Also install the recommended packages for VNC and noVNC
-apt-get install -y --no-install-recommends \
+apt-get install -y \
 	dbus-x11 \
 	xfce4 xfce4-goodies \
-	xfonts-base x11-xserver-utils \
-	tigervnc-standalone-server tigervnc-common tigervnc-xorg-extension \
+	tigervnc-standalone-server \
 	novnc
 
 apt-get clean

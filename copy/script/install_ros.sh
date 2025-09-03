@@ -32,7 +32,8 @@ apt-get install -y --no-install-recommends \
 	python3 \
 	python3-rosdep \
 	python3-rosinstall \
-	python3-vcstools
+	python3-vcstools \
+	libeigen3-dev
 # Update rosdep
 rosdep init
 rosdep update

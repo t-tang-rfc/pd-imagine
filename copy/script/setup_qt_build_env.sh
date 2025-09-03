@@ -8,6 +8,13 @@
 set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
+
+# === Check Ubuntu version compatibility ===
+if ! grep -qE "Ubuntu (20.04|24.04)" /etc/os-release; then
+	echo "Error: This script is only intended for Ubuntu 20.04 and 24.04 LTS"
+	exit 1
+fi
+
 # === Setup build environment ===
 echo "=== Setting up build environment for Qt6..."
 apt-get update
@@ -16,17 +23,23 @@ apt-get install -y --no-install-recommends \
 # @note:
 # - Default cmake version on Ubuntu 20.04 is too old for Qt6, you need to install a newer version from Kitware's apt repository.
 # - But at the same time, you would better pin the version to a reasonable one (here a version that is equivalent to the default of Ubuntu 24.04) to avoid bleeding-edge versions (like 4.0+), which may highly likely break compatibility of other components of your project.
-CMAKE_VERSION='3.28.6-0kitware1ubuntu20.04.1'
 if grep -q "Ubuntu 20.04" /etc/os-release; then
 	# Install Kitware's apt repository for newer CMake
 	# @see: https://apt.kitware.com/
+	CMAKE_VERSION='3.28.6-0kitware1ubuntu20.04.1'
 	wget -qO- https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor > /usr/share/keyrings/kitware-archive-keyring.gpg
 	echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list > /dev/null
 	apt-get update
+	CMAKE_PACKAGES="cmake-data=$CMAKE_VERSION cmake=$CMAKE_VERSION"
+else
+	# Ubuntu 24.04 - use default CMake version
+	CMAKE_PACKAGES="cmake"
 fi
+
+# Install all packages
 apt-get install -y --no-install-recommends \
 	build-essential \
-	cmake-data=$CMAKE_VERSION cmake=$CMAKE_VERSION \
+	$CMAKE_PACKAGES \
 	ninja-build \
 	python3 \
 	libfontconfig1-dev \

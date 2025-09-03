@@ -1,11 +1,11 @@
 # /////////////////////////////////////////////////////////////
-# @file: pd-imagine/Dockerfile.ros1-qt6-vnc
-# @brief: This Dockerfile sets up a ROS1 and Qt6 environment with VNC support on Ubuntu 20.04.
-# @note: This Dockerfile is designed to be used as a devcontainer for robot related applications development, and you can log in as a non-root user via VNC to interact with the GUI application you created.
+# @file: pd-imagine/Dockerfile.qt6-dev-vnc
+# @brief: This Dockerfile sets up a Qt6 development environment with VNC support on Ubuntu 24.04.
 # /////////////////////////////////////////////////////////////
 
-# === Based on pre-built image with ROS Noetic dev. env.
-FROM pd-imagine:ros-noetic-dev
+# === Use an official Ubuntu 24.04 (noble numbat) as a base image 
+# @see: https://hub.docker.com/_/ubuntu
+FROM ubuntu:24.04
 
 SHELL ["/bin/bash", "-euc"]
 
@@ -26,12 +26,8 @@ RUN <<-EOT
 		wget gnupg ca-certificates \
 		openssh-client git nano tmux \
 		sudo \
-		build-essential
-	wget -qO- https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor > /usr/share/keyrings/kitware-archive-keyring.gpg
-	echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list > /dev/null
-	apt-get update
-	apt-get install -y --no-install-recommends \
-		cmake-data=3.28.6-0kitware1ubuntu20.04.1 cmake=3.28.6-0kitware1ubuntu20.04.1
+		build-essential \
+		cmake
 	apt-get clean
 	rm -rf /var/lib/apt/lists/*
 EOT
@@ -57,21 +53,15 @@ COPY --chmod=0600 copy/config/ssh-conf /tmp/ssh-conf
 
 # --- Create a non-root user
 # Create a non-root user with the specified UID and GID and grant sudo privileges
-# - Latest ubuntu image may have automatically created a default non-root user---named `ubuntu`, with user id 1000, group id 1000
-# - However, for ubuntu 20.04, the default user is not created by default, so we create it here.
+# @note: Ubuntu image has a default non-root user named `ubuntu`, with user id 1000, group id 1000 and this dockerfile is designed to use that one.
 ARG PD_USER_NAME='ubuntu'
 ARG PD_USER_UID='1000'
 ARG PD_USER_GID=$PD_USER_UID
 ARG PD_USER_HOME="/home/${PD_USER_NAME}"
 ARG PD_WORKSPACE="${PD_USER_HOME}/wksp"
 RUN <<-EOT
-	groupadd --gid $PD_USER_GID $PD_USER_NAME
-	useradd --uid $PD_USER_UID --gid $PD_USER_GID -m $PD_USER_NAME
 	echo "${PD_USER_NAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$PD_USER_NAME
 	chmod 0440 /etc/sudoers.d/$PD_USER_NAME
-	mkdir -p $PD_USER_HOME
-	chmod 0750 $PD_USER_HOME
-	chown $PD_USER_NAME:$PD_USER_NAME $PD_USER_HOME
 EOT
 
 # --- Setup VNC/noVNC ---

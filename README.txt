@@ -1,6 +1,6 @@
 ``` header
 @file: pd-imagine/README.txt
-@date: [created: 2025-02-05, updated: 2025-07-19]
+@date: [created: 2025-02-05, updated: 2025-09-02]
 @author: [madpang, t-tang-rfc]
 ```
 # pd-imagine
@@ -25,43 +25,24 @@ ANOTHER NOTE, git credential sharing is handled by `credential.helper` supplied 
 
 ## Usage
 
-=== When used through VS Code Dev Containers Extension
-
 To use this Docker image as a dev container in VS Code:
 1. `cd` into your <project-folder>
 2. `git submodule add --branch main https://github.com/madpang/pd-imagine.git .devcontainer`
-3. Open the workspace folder in VS Code, via `code .`
-4. Use VS Code command "Dev Containers: Reopen in Container" to start the container
+3. Build the Docker image by running `./build.sh` from the `.devcontainer` directory
+4. Create a `devcontainer.json` file in your `.devcontainer` directory. You can either:
+   - Create a symbolic link to one of the task-specific predefined configurations provided in this repository
+   - Create your own custom configuration to suit your specific needs
+5. Open the workspace folder in VS Code, via `code .`
+6. Use VS Code command "Dev Containers: Reopen in Container" to start the container
 @see: [Developing inside a Container](https://code.visualstudio.com/docs/devcontainers/containers).
 If you do not want to embed this project as a submodule, you can also create a `.devcontainer` symbolic link to the `pd-imagine` folder.
 
 NOTE, currently, if using "open folder in dev container" feature in VS Code, the container will NOT automatically stop when you close the connection.
 You need to manually stop the container by executing `docker stop <container-id>` on the host machine.
 
-=== When used as a standalone Docker container of a Jupyter server
-
-Execute the following commands to *build* the Docker image:
-``` cmd @host
-git clone --branch main --single-branch https://github.com/madpang/pd-imagine.git
-cd pd-imagine
-docker build -t pd-imagine .
-```
-
-Execute the following command to launch the container and login to the interactive shell of the container:
-``` cmd @host
-docker run -it -p 8888:8888 -v <path-to-your-stack-folder>:/home/ubuntu/wksp/<your-project-name> pd-imagine /bin/bash
-# e.g., docker run -it -p 8888:8888 -v ~/wksp/github/my-project:/home/ubuntu/wksp/my-project pd-imagine:latest /bin/bash
-```
-Then start the JupyterLab server by executing the following command inside the container:
-``` cmd @container
-jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''
-```
-After the server is started, you can access the JupyterLab server by opening a web browser from your client machine and navigating to `http://host-server-address:8888`.
-
 ## Additional Notes
 
-The SSH/GPG agent forwarding enabled docker env. can be used in many other tasks besides Python development.
-If you want to use it for other purposes, you can checkout tag `barebone` and add your own features.
+The SSH/GPG agent forwarding enabled docker env. can be used in any development scenarios.
 
 ## Guideline for contribution
 
