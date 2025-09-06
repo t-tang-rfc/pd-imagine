@@ -1,0 +1,27 @@
+{
+	"name": "pd-imagine",
+	"image": "pd-imagine:python-dev",
+	"runArgs": [
+		"--mount", "type=bind,src=${localEnv:HOME}/.gnupg,dst=/home/ubuntu/.gnupg,readonly",
+		"--mount", "type=bind,src=/run/user/1000/gnupg,dst=/run/user/1000/gnupg,readonly",
+		"--mount", "type=bind,src=${localEnv:HOME}/wksp/git-config,dst=/home/ubuntu/wksp/git-config,readonly"
+	],
+	"workspaceMount": "type=bind,src=${localWorkspaceFolder},target=/home/ubuntu/wksp/git-repo/panda/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/home/ubuntu/wksp/git-repo/panda/${localWorkspaceFolderBasename}",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.defaultInterpreterPath": "/opt/venv/bin/python",				
+				"python.venvPath": "/opt/venv",
+				"python.terminal.activateEnvironment": true
+			},
+			"extensions": [
+				"ericmccarthy.vs-code-mark-point",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
+				"ms-python.python",
+				"ms-toolsai.jupyter"
+			]
+		}
+	}
+}
