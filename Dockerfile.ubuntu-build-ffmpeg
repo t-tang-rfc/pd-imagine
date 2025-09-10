@@ -18,35 +18,10 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
 # Set the environment variable for linking the CUDA library
 ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/lib"
 
-# === Install necessary packages
-# @see: [FFmpeg Compilation Guide from official site](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu)
-RUN apt-get update && apt-get install -y \
-    autoconf \
-    automake \
-    build-essential \
-    cmake \
-    git \
-    libass-dev \
-    libfreetype6-dev \
-    libgnutls28-dev \
-    libmp3lame-dev \
-    libsdl2-dev \
-    libtool \
-    libva-dev \
-    libvdpau-dev \
-    libvorbis-dev \
-    libxcb1-dev \
-    libxcb-shm0-dev \
-    libxcb-xfixes0-dev \
-    meson \
-    ninja-build \
-    pkg-config \
-    texinfo \
-    wget \
-    yasm \
-    zlib1g-dev \
-    libc6 libc6-dev \
-    libnuma1 libnuma-dev
+# === Copy script to setup the environment
+COPY --chmod=0755 copy/script/setup_ffmpeg_build_env.sh /tmp/setup_ffmpeg_build_env.sh
+
+RUN /tmp/setup_ffmpeg_build_env.sh
 
 # === Set up the working directory
 ARG WKSP='/wksp'
