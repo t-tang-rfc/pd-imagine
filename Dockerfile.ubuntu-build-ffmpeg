@@ -1,0 +1,59 @@
+# /////////////////////////////////////////////////////////////
+# @file: pd-imagine/Dockerfile.ubuntu-build-ffmpeg
+# @brief: This Dockerfile sets up an environment for building FFmpeg with NVIDIA Video Codec support on Ubuntu 24.04.
+# /////////////////////////////////////////////////////////////
+
+# === Use nvidia/cuda as a base image
+# @see: https://hub.docker.com/r/nvidia/cuda/tags?ordering=-last_updated&name=ubuntu24.04
+# @note:
+# - By checking `cat /etc/os-release` in the container, it is confirmed that the base image is Ubuntu 24.04
+# - This image requires the NVIDIA Container Toolkit to be installed on the host machine to enable GPU support in Docker containers.
+FROM nvidia/cuda:12.6.3-devel-ubuntu24.04
+
+SHELL ["/bin/bash", "-euc"]
+
+# @see: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+
+# Set the environment variable for linking the CUDA library
+ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/lib"
+
+# === Install necessary packages
+# @see: [FFmpeg Compilation Guide from official site](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu)
+RUN apt-get update && apt-get install -y \
+    autoconf \
+    automake \
+    build-essential \
+    cmake \
+    git \
+    libass-dev \
+    libfreetype6-dev \
+    libgnutls28-dev \
+    libmp3lame-dev \
+    libsdl2-dev \
+    libtool \
+    libva-dev \
+    libvdpau-dev \
+    libvorbis-dev \
+    libxcb1-dev \
+    libxcb-shm0-dev \
+    libxcb-xfixes0-dev \
+    meson \
+    ninja-build \
+    pkg-config \
+    texinfo \
+    wget \
+    yasm \
+    zlib1g-dev \
+    libc6 libc6-dev \
+    libnuma1 libnuma-dev
+
+# === Set up the working directory
+ARG WKSP='/wksp'
+RUN mkdir $WKSP
+
+WORKDIR $WKSP
+
+# === Setup the launch behavior
+# Set the default command (to keep the container alive)
+CMD ["sleep", "infinity"]
