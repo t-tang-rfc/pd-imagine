@@ -33,12 +33,13 @@ create_ros1_qt6_vnc_image() {
 }
 
 create_ros_noetic_dev_image() {
+	local image_name="pd-imagine/ros-noetic-dev:latest"
 	# Build Docker image using Dockerfile.ros-noetic-dev
-	if ! docker image inspect pd-imagine:ros-noetic-dev >/dev/null 2>&1; then
-		echo "=== Building Docker image pd-imagine:ros-noetic-dev..."
-		docker build --network=host -f Dockerfile.ros-noetic-dev -t pd-imagine:ros-noetic-dev .
+	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
+		echo "=== Building Docker image $image_name..."
+		docker build --network=host -f Dockerfile.ros-noetic-dev -t "$image_name" .
 	else
-		echo "[INFO] Docker image pd-imagine:ros-noetic-dev already exists, skipping build."
+		echo "[INFO] Docker image $image_name already exists, skipping build."
 	fi
 }
 

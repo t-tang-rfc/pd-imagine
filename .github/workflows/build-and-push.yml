@@ -18,7 +18,7 @@ jobs:
     
     strategy:
       matrix:
-        image_type: [ros1-qt6-vnc]
+        image_type: [ros-noetic-dev]
     
     steps:
     - name: Checkout repository
@@ -54,6 +54,10 @@ jobs:
       run: |
         LOCAL_IMAGE=""
         case "${{ matrix.image_type }}" in
+          "ros-noetic-dev")
+            ./build.sh create_ros_noetic_dev_image
+            LOCAL_IMAGE="pd-imagine/ros-noetic-dev:latest"
+            ;;
           "qt6-dev-vnc")
             ./build.sh create_qt6_dev_vnc_image
             LOCAL_IMAGE="pd-imagine/qt6-dev-vnc:latest"
@@ -61,11 +65,7 @@ jobs:
           "ros1-qt6-vnc")
             ./build.sh create_ros1_qt6_vnc_image
             LOCAL_IMAGE="pd-imagine/ros1-qt6-vnc:latest"
-            ;;
-          "ros-noetic-dev")
-            ./build.sh create_ros_noetic_dev_image
-            LOCAL_IMAGE="pd-imagine/ros-noetic-dev:latest"
-            ;;
+            ;;            
         esac
 
         if [ -n "$LOCAL_IMAGE" ]; then
