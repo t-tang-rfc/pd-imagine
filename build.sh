@@ -18,16 +18,17 @@ create_python_dev_image() {
 }
 
 create_ros1_qt6_vnc_image() {
+	local image_name="pd-imagine/ros1-qt6-vnc:latest"
 	# Build Docker image using Dockerfile.ros1-qt6-vnc
-	if ! docker image inspect pd-imagine:ros1-qt6-vnc >/dev/null 2>&1; then
-		echo "=== Building Docker image pd-imagine:ros1-qt6-vnc..."
+	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
+		echo "=== Building Docker image $image_name..."
 		# Dependencies
 		create_ros_noetic_dev_image
 		build_qt6_on_ubuntu "20.04"
 		# Build the image
-		docker build --network=host -f Dockerfile.ros1-qt6-vnc -t pd-imagine:ros1-qt6-vnc .
+		docker build --network=host -f Dockerfile.ros1-qt6-vnc -t "$image_name" .
 	else
-		echo "[INFO] Docker image pd-imagine:ros1-qt6-vnc already exists, skipping build."
+		echo "[INFO] Docker image $image_name already exists, skipping build."
 	fi
 }
 
