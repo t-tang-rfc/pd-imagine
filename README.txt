@@ -19,9 +19,7 @@ When used as a VS Code dev container, you get the following extra features:
 4. Interactive Python Window
 Those bonus features are applicable even when connecting to a remote server using *Remote SSH extension*.
 
-NOTE, you will *login* to the container as a non-root user `ubuntu`.
-
-ANOTHER NOTE, git credential sharing is handled by `credential.helper` supplied by VS Code Dev Containers extension, but `includeif.gitdir` or `include.path` will NOT work UNLESS the external config file is placed inside the repository mounted to the container.
+Note, git credential sharing is handled by `credential.helper` supplied by VS Code Dev Containers extension.
 
 ## Usage
 
@@ -39,10 +37,6 @@ If you do not want to embed this project as a submodule, you can also create a `
 
 NOTE, currently, if using "open folder in dev container" feature in VS Code, the container will NOT automatically stop when you close the connection.
 You need to manually stop the container by executing `docker stop <container-id>` on the host machine.
-
-## Additional Notes
-
-The SSH/GPG agent forwarding enabled docker env. can be used in any development scenarios.
 
 ## Guideline for contribution
 

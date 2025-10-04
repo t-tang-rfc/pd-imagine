@@ -7,6 +7,16 @@ set -euo pipefail
 
 # === Function Definitions
 
+create_python_dev_image() {
+	# Build Docker image using Dockerfile.python-dev
+	if ! docker image inspect pd-imagine:python-dev >/dev/null 2>&1; then
+		echo "=== Building Docker image pd-imagine:python-dev..."
+		docker build --network=host -f Dockerfile.python-dev -t pd-imagine:python-dev .
+	else
+		echo "[INFO] Docker image pd-imagine:python-dev already exists, skipping build."
+	fi
+}
+
 create_ros1_qt6_vnc_image() {
 	# Build Docker image using Dockerfile.ros1-qt6-vnc
 	if ! docker image inspect pd-imagine:ros1-qt6-vnc >/dev/null 2>&1; then
@@ -92,6 +102,7 @@ create_ubuntu_build_qt6_image() {
 usage() {
 	echo "Usage: $0 <function_name>"
 	echo "Available functions:"
+	echo "  - create_python_dev_image"
 	echo "  - create_qt6_dev_vnc_image"
 	echo "  - create_ros1_qt6_vnc_image"
 	echo "  - create_ros_noetic_dev_image"
