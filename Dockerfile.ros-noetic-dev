@@ -7,6 +7,12 @@
 # @see: https://hub.docker.com/_/ubuntu/tags?name=20.04
 FROM ubuntu:20.04
 
+LABEL \
+	org.opencontainers.image.title="pd-imagine/ros-noetic-dev" \
+	org.opencontainers.image.description="A Docker image for ROS Noetic development on Ubuntu 20.04." \
+	org.opencontainers.image.licenses="MIT" \
+	org.opencontainers.image.version="1.0.0"
+
 SHELL ["/bin/bash", "-euc"]
 
 # === Copy script to setup the environment
