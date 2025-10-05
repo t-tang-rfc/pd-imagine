@@ -3,8 +3,9 @@ run-name: Build and Push Docker Images to GitHub Container Registry
 
 on:
   push:
-    branches: [ feature/** ]
-  workflow_dispatch: # Allows manual triggering
+    branches: [develop]
+  pull_request:
+    branches: [develop]
 
 env:
   REGISTRY: ghcr.io
@@ -40,7 +41,7 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image_type }}
         tags: |
-          type=sha,prefix={{branch}}-          
+          type=ref,event=pr
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
           org.opencontainers.image.source=https://github.com/${{ github.repository }}
