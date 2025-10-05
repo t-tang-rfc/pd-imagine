@@ -19,7 +19,7 @@ jobs:
     
     strategy:
       matrix:
-        image_type: [ubuntu-build-qt6, ros-noetic-dev]
+        image_type: [ubuntu-build-qt6, ros-noetic-dev, python-dev]
     
     steps:
     - name: Checkout repository
