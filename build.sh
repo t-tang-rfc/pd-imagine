@@ -8,7 +8,7 @@ set -euo pipefail
 # === Function Definitions
 
 create_python_dev_image() {
-	local image_name="pd-imagine/python-dev"
+	local image_name="pd-imagine/python-dev:latest"
 	# Build Docker image using Dockerfile.python-dev
 	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
 		echo "=== Building Docker image $image_name..."
@@ -19,7 +19,7 @@ create_python_dev_image() {
 }
 
 create_ros1_qt6_vnc_image() {
-	local image_name="pd-imagine/ros1-qt6-vnc"
+	local image_name="pd-imagine/ros1-qt6-vnc:latest"
 	# Build Docker image using Dockerfile.ros1-qt6-vnc
 	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
 		echo "=== Building Docker image $image_name..."
@@ -34,7 +34,7 @@ create_ros1_qt6_vnc_image() {
 }
 
 create_qt6_dev_vnc_image() {
-	local image_name="pd-imagine/qt6-dev-vnc"
+	local image_name="pd-imagine/qt6-dev-vnc:latest"
 	# Build Docker image using Dockerfile.qt6-dev-vnc
 	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
 		echo "=== Building Docker image $image_name..."
@@ -46,13 +46,26 @@ create_qt6_dev_vnc_image() {
 }
 
 create_ros_noetic_dev_image() {
-	local image_name="pd-imagine/ros-noetic-dev"
-	# Build Docker image using Dockerfile.ros-noetic-dev
-	if ! docker image inspect "$image_name" >/dev/null 2>&1; then
+	local image_name="pd-imagine/ros-noetic-dev:latest"
+	local remote_image="ghcr.io/madpang/pd-imagine/ros-noetic-dev:latest"
+	
+	# Check if local image already exists
+	if docker image inspect "$image_name" >/dev/null 2>&1; then
+		echo "[INFO] Docker image $image_name already exists, skipping build."
+		return
+	fi
+	
+	# Try to pull from GitHub Container Registry first
+	echo "=== Attempting to pull $remote_image..."
+	if docker image pull "$remote_image" >/dev/null 2>&1; then
+		echo "[INFO] Successfully pulled $remote_image"
+		echo "=== Tagging as local image $image_name..."
+		docker image tag "$remote_image" "$image_name"
+		echo "[INFO] Tagged $remote_image as $image_name"
+	else
+		echo "[INFO] Failed to pull $remote_image, building locally..."
 		echo "=== Building Docker image $image_name..."
 		docker build --network=host -f Dockerfile.ros-noetic-dev -t "$image_name" .
-	else
-		echo "[INFO] Docker image $image_name already exists, skipping build."
 	fi
 }
 
@@ -60,7 +73,7 @@ build_qt6_on_ubuntu() {
 	# @param[in]: Ubuntu version, should be either 20.04 or 24.04
 	local ubuntu_version=${1:-24.04}
 	# Derived variables (@note: MUST match that in )
-	local image_tag="pd-imagine/ubuntu-build-qt6"
+	local image_tag="pd-imagine/ubuntu-build-qt6:latest"
 	# Fixed variables
 	local downloads='./downloads'
 	local artifacts='./artifacts'
@@ -95,7 +108,7 @@ create_ubuntu_build_qt6_image() {
 		exit 1
 	fi
 	# Derived variables
-	local image_tag="pd-imagine/ubuntu-build-qt6"
+	local image_tag="pd-imagine/ubuntu-build-qt6:latest"
 	
 	# Build Docker image using Dockerfile.ubuntu-build-qt6
 	if ! docker image inspect "$image_tag" >/dev/null 2>&1; then

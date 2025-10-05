@@ -5,7 +5,7 @@
 # /////////////////////////////////////////////////////////////
 
 # === Based on pre-built image with ROS Noetic dev. env.
-FROM pd-imagine:ros-noetic-dev
+FROM pd-imagine/ros-noetic-dev:latest
 
 SHELL ["/bin/bash", "-euc"]
 
