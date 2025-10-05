@@ -18,13 +18,7 @@ jobs:
     
     strategy:
       matrix:
-        include:
-          - image_type: ubuntu-build-qt6
-            ubuntu_version: "20.04"
-          - image_type: ubuntu-build-qt6
-            ubuntu_version: "24.04"
-          - image_type: ros-noetic-dev
-            ubuntu_version: ""
+        image_type: [ubuntu-build-qt6, ros-noetic-dev]
     
     steps:
     - name: Checkout repository
@@ -44,7 +38,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image_type }}${{ matrix.ubuntu_version != '' && format('-{0}', matrix.ubuntu_version) || '' }}
+        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image_type }}
         tags: |
           type=sha,prefix={{branch}}-          
           type=raw,value=latest,enable={{is_default_branch}}
@@ -60,5 +54,3 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        build-args: |
-          ${{ matrix.ubuntu_version != '' && format('UBUNTU_VERSION={0}', matrix.ubuntu_version) || '' }}
