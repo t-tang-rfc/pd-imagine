@@ -18,7 +18,13 @@ jobs:
     
     strategy:
       matrix:
-        image_type: [ros-noetic-dev]
+        include:
+          - image_type: ubuntu-build-qt6
+            ubuntu_version: "20.04"
+          - image_type: ubuntu-build-qt6
+            ubuntu_version: "24.04"
+          - image_type: ros-noetic-dev
+            ubuntu_version: ""
     
     steps:
     - name: Checkout repository
@@ -38,45 +44,21 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image_type }}
+        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image_type }}${{ matrix.ubuntu_version != '' && format('-{0}', matrix.ubuntu_version) || '' }}
         tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
+          type=sha,prefix={{branch}}-          
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
-          org.opencontainers.image.title=PD-Imagine ${{ matrix.image_type }}
-          org.opencontainers.image.description=Docker image for PD-Imagine project - ${{ matrix.image_type }}
+          org.opencontainers.image.source=https://github.com/${{ github.repository }}
           org.opencontainers.image.vendor=madpang
-          org.opencontainers.image.version=${{ github.sha }}
 
-    - name: Build, Tag and Push Image
-      run: |
-        LOCAL_IMAGE=""
-        case "${{ matrix.image_type }}" in
-          "ros-noetic-dev")
-            ./build.sh create_ros_noetic_dev_image
-            LOCAL_IMAGE="pd-imagine/ros-noetic-dev:latest"
-            ;;
-          "qt6-dev-vnc")
-            ./build.sh create_qt6_dev_vnc_image
-            LOCAL_IMAGE="pd-imagine/qt6-dev-vnc:latest"
-            ;;
-          "ros1-qt6-vnc")
-            ./build.sh create_ros1_qt6_vnc_image
-            LOCAL_IMAGE="pd-imagine/ros1-qt6-vnc:latest"
-            ;;            
-        esac
-
-        if [ -n "$LOCAL_IMAGE" ]; then
-          echo "${{ steps.meta.outputs.tags }}" | while read -r tag; do
-            if [ -n "$tag" ]; then
-              echo "Tagging $LOCAL_IMAGE as $tag"
-              docker image tag $LOCAL_IMAGE $tag
-              echo "Pushing $tag"
-              docker image push $tag
-            fi
-          done
-        else
-          echo "LOCAL_IMAGE is undefined, skipping tagging and pushing."
-        fi
+    - name: Build & Push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: Dockerfile.${{ matrix.image_type }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          ${{ matrix.ubuntu_version != '' && format('UBUNTU_VERSION={0}', matrix.ubuntu_version) || '' }}
