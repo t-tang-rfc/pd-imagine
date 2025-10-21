@@ -10,6 +10,3 @@ downloads/
 
 # --- temporary files
 tmp*
-
-# --- devcontainer.json
-devcontainer.json
