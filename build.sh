@@ -8,7 +8,7 @@ set -euo pipefail
 # === Function Definitions
 
 create_python_dev_image() {
-	local image_name="pd-imagine/python-dev:latest"
+	local image_name="python-dev:riverrun"
 	local remote_image="ghcr.io/madpang/pd-imagine/python-dev:latest"
 	
 	# Check if local image already exists
@@ -18,17 +18,17 @@ create_python_dev_image() {
 	fi
 	
 	# Try to pull from GitHub Container Registry first
-	echo "=== Attempting to pull $remote_image..."
-	if docker image pull "$remote_image" >/dev/null 2>&1; then
-		echo "[INFO] Successfully pulled $remote_image"
-		echo "=== Tagging as local image $image_name..."
-		docker image tag "$remote_image" "$image_name"
-		echo "[INFO] Tagged $remote_image as $image_name"
-	else
-		echo "[INFO] Failed to pull $remote_image, building locally..."
+	# echo "=== Attempting to pull $remote_image..."
+	# if docker image pull "$remote_image" >/dev/null 2>&1; then
+	# 	echo "[INFO] Successfully pulled $remote_image"
+	# 	echo "=== Tagging as local image $image_name..."
+	# 	docker image tag "$remote_image" "$image_name"
+	# 	echo "[INFO] Tagged $remote_image as $image_name"
+	# else
+	# 	echo "[INFO] Failed to pull $remote_image, building locally..."
 		echo "=== Building Docker image $image_name..."
 		docker build --network=host -f Dockerfile.python-dev -t "$image_name" .
-	fi
+	# fi
 }
 
 create_ros1_qt6_vnc_image() {

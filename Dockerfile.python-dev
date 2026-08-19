@@ -21,7 +21,7 @@ RUN <<-EOT
 	export DEBIAN_FRONTEND=noninteractive
 	apt-get update
 	apt-get install -y --no-install-recommends \
-		tzdata \
+		tzdata fonts-noto-cjk \
 		wget gnupg ca-certificates \
 		openssh-client git nano tmux \
 		sudo \

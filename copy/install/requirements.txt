@@ -1,8 +1,15 @@
-# Jupyter packages
-# @see: https://pypi.org/project/jupyter/
+# jupyter               : Jupyter packages, for interactive data exploration (@see: https://pypi.org/project/jupyter/)
+# numpy                 : Fundamental math package
+# opencv-python-headless: OpenCV python binding, for image processing
+# matplotlib            : Plotting (can output PNG, w/o need of display)
+# pandas                : Tabular processing / CSV
+# mcap                  : Reader for the .mcap container format (@see: https://mcap.dev/)
+# msgpack               : Payload decoder (i.e, a mcap channel can carry a msgpack-encoded payload)
+# ---
 jupyter
-# Core packages for image processing
 numpy
 opencv-python-headless
-# Data visualization
 matplotlib
+pandas
+mcap
+msgpack

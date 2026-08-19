@@ -10,18 +10,15 @@
 	"workspaceFolder": "/home/ubuntu/wksp/git-repo/panda/${localWorkspaceFolderBasename}",
 	"customizations": {
 		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-toolsai.jupyter"
+			],
 			"settings": {
 				"python.defaultInterpreterPath": "/opt/venv/bin/python",				
 				"python.venvPath": "/opt/venv",
 				"python.terminal.activateEnvironment": true
-			},
-			"extensions": [
-				"ericmccarthy.vs-code-mark-point",
-				"streetsidesoftware.code-spell-checker",
-				"eamodio.gitlens",
-				"ms-python.python",
-				"ms-toolsai.jupyter"
-			]
+			}			
 		}
 	}
 }
