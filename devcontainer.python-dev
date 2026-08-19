@@ -12,13 +12,16 @@
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
-				"ms-toolsai.jupyter"
+				"ms-toolsai.jupyter",
+				"ms-toolsai.datawrangler"
 			],
 			"settings": {
-				"python.defaultInterpreterPath": "/opt/venv/bin/python",				
+				"python.defaultInterpreterPath": "/opt/venv/bin/python",
 				"python.venvPath": "/opt/venv",
-				"python.terminal.activateEnvironment": true
-			}			
+				"python.terminal.activateEnvironment": true,
+				"jupyter.interactiveWindow.cellMarker.codeRegex": "^\\s*#\\s*(===|%%)",
+				"jupyter.interactiveWindow.cellMarker.default": "# ==="
+			}
 		}
 	}
 }
